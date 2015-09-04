@@ -1,0 +1,8 @@
+FROM node:0.12
+
+RUN echo "//registry.npmjs.org/:_authToken=00338b35-29f5-4808-aceb-71cc81cfac3e" > /root/.npmrc
+
+RUN mkdir -p /opt/service
+WORKDIR /opt/service
+ADD package.json ./
+RUN npm install

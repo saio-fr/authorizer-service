@@ -1,0 +1,112 @@
+{
+  "db": {
+    "dialect": "postgres",
+    "user": "postgres",
+    "host": "db",
+    "port": "5432",
+    "dbname": "postgres"
+  },
+
+  "ws": {
+    "url": "ws://crossbar:8080/",
+    "realm": "test",
+    "domain": "service.authorizer",
+    "authId": "service"
+  },
+
+  "auth": {
+    "params": ["companyId"],
+
+    "roles": [{
+      "name": "customer",
+      "params": ["companyId"]
+    }, {
+      "name": "admin",
+      "params": ["companyId"],
+      "extends": [{
+        "name": "customer"
+      }]
+    }, {
+      "name": "superAdmin",
+      "extends": [{
+        "name": "admin",
+        "bypass": ["companyId"]
+      }]
+    }],
+
+    "actions": ["call"],
+
+    "ressources": [{
+      "name": "addAdmin",
+      "wsUrl": "service.admin.add"
+    }, {
+      "name": "rmAdmin",
+      "wsUrl": "service.admin.remove"
+    }, {
+      "name": "getRoles",
+      "wsUrl": "service.authorizer.roles.get"
+    }, {
+      "name": "addCustomer",
+      "params": ["companyId"],
+      "wsUrl": "service.company..customers.add"
+    }, {
+      "name": "rmCustomer",
+      "params": ["companyId"],
+      "wsUrl": "service.company..customers.remove"
+    }, {
+      "name": "buy",
+      "params": ["companyId"],
+      "wsUrl": "service.company..buy"
+    }, {
+      "name": "setPassword",
+      "params": ["authId"],
+      "wsUrl": "service.me..password.set"
+    }, {
+      "name": "getCompanies",
+      "wsUrl": "service.companies.get"
+    }, {
+      "name": "countCustomers",
+      "params": ["companyId"],
+      "wsUrl": "service.company..stats.customers.count"
+    }],
+
+    "permissions": [{
+      "role": "superAdmin",
+      "action": "call",
+      "ressource": "addAdmin"
+    }, {
+      "role": "superAdmin",
+      "action": "call",
+      "ressource": "rmAdmin"
+    }, {
+      "role": "superAdmin",
+      "action": "call",
+      "ressource": "getRoles"
+    }, {
+      "role": "superAdmin",
+      "action": "call",
+      "ressource": "countCustomers",
+      "bypass": ["companyId"]
+    }, {
+      "role": "admin",
+      "action": "call",
+      "ressource": "addCustomer"
+    }, {
+      "role": "admin",
+      "action": "call",
+      "ressource": "rmCustomer"
+    }, {
+      "role": "customer",
+      "action": "call",
+      "ressource": "buy"
+    }, {
+      "role": "<REGISTERED>",
+      "action": "call",
+      "ressource": "setPassword"
+    }, {
+      "role": "<ANONYMOUS>",
+      "action": "call",
+      "ressource": "getCompanies"
+    }]
+  }
+}

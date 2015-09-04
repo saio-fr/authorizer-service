@@ -1,0 +1,26 @@
+{
+  "name": "@saio/auth-test",
+  "version": "0.1.0",
+  "description": "Tests with several clients for integration test of authorizer-service",
+  "main": "authorizer.test.integration.js",
+  "dependencies": {
+    "@saio/wsocket-component": "*",
+    "@saio/service-runner": "*",
+    "when": "*",
+    "underscore": "*",
+    "blue-tape": "*",
+    "tap-spec": "*"
+  },
+  "scripts": {
+    "test": "node authorizer.test.integration.js | tap-spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:saio-fr/lib.git"
+  },
+  "author": "Alexis Terrat",
+  "bugs": {
+    "url": "https://github.com/saio-fr/lib/issues"
+  },
+  "homepage": "https://github.com/saio-fr/lib"
+}

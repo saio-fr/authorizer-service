@@ -1,0 +1,8 @@
+FROM auth-base
+
+WORKDIR /opt/service
+ADD test/integration/helpers/client.js test/integration/authorizer.test.integration.js ./
+ADD tasks/integration/config/test.package.json ./package.json
+
+RUN npm install
+ENTRYPOINT ["npm","test"]

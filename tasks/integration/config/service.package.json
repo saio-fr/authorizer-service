@@ -1,0 +1,24 @@
+{
+  "name": "@saio/auth-service",
+  "version": "0.1.0",
+  "description": "Service that registers procedures for integration tests of authorizer-service",
+  "main": "service.js",
+  "dependencies": {
+    "@saio/service-runner": "*",
+    "@saio/wsocket-component": "*",
+    "when": "*",
+    "underscore": "*"
+  },
+  "scripts": {
+    "start": "service-runner service.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:saio-fr/lib.git"
+  },
+  "author": "Alexis Terrat",
+  "bugs": {
+    "url": "https://github.com/saio-fr/lib/issues"
+  },
+  "homepage": "https://github.com/saio-fr/lib"
+}

@@ -1,0 +1,5 @@
+{
+  "auth": {
+    "params": ["p0", "p1", "userId", "p3", "name"]
+  }
+}
