@@ -205,11 +205,22 @@ tape('authorizer integration test', { timeout: 5000 }, function(t) {
     });
   });
 
-  t.test('john doe set his password', function(st) {
-    return clients.johndoe.service.call('service.me.johndoe.password.set', { password: '42xy66ab'})
+  t.test('roger set his password', function(st) {
+    return clients.roger.service.call('service.me.roger.password.set', { password: '42xy66ab'})
     .tap(function(result) {
       var expected = '********';
       st.equal(result, expected, 'set password success');
+    });
+  });
+
+  t.test('john doe set his password (fail, he\'s anonymous)', function(st) {
+    return clients.johndoe.service.call('service.me.johndoe.password.set', { password: '42xy66ab'})
+    .tap(function() {
+      st.fail('john doe is authorized to change his password !');
+    })
+    .catch(function() {
+      st.pass('john doe set his password fail');
+      return when.resolve();
     });
   });
 

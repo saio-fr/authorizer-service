@@ -1,7 +1,7 @@
 #!/bin/env bash
 
 # install
-#docker build -t auth-base -f tasks/integration/baseDockerfile .;
+docker build -t auth-base -f tasks/integration/baseDockerfile .;
 docker build -t auth-crossbar -f tasks/integration/crossbarDockerfile .;
 docker build -t auth-authorizer -f tasks/integration/authorizerDockerfile .;
 docker build -t auth-service -f tasks/integration/serviceDockerfile .;
@@ -13,13 +13,13 @@ docker run -d \
 	--name auth-db \
 	-e POSTGRES_PASSWORD=test \
 	postgres;
-sleep 3;
+sleep 4;
 
 echo "starting crossbar...";
 docker run -d \
   --name auth-crossbar \
   auth-crossbar;
-sleep 3;
+sleep 4;
 
 echo "starting authorizer...";
 docker run -d \
@@ -29,7 +29,7 @@ docker run -d \
   auth-authorizer \
     --ws-password servicepassword \
     --db-password test;
-sleep 3;
+sleep 4;
 
 echo "starting service...";
 docker run -d \
@@ -37,7 +37,7 @@ docker run -d \
   --link auth-crossbar:crossbar \
   auth-service \
     --ws-password servicepassword;
-sleep 3;
+sleep 4;
 
 echo "running test...";
 docker run \
@@ -64,7 +64,7 @@ docker rmi auth-test;
 docker rmi auth-service;
 docker rmi auth-authorizer;
 docker rmi auth-crossbar;
-# docker rmi auth-base;
+docker rmi auth-base;
 
 # return with the exit code of the test
 if [ $TEST_EC -eq 0 ]
@@ -72,6 +72,5 @@ then
   echo "It Saul Goodman !";
   exit 0;
 else
-  echo "test failed";
   exit $TEST_EC;
 fi

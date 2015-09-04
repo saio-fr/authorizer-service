@@ -12,7 +12,7 @@
     "tap-spec": "*"
   },
   "scripts": {
-    "test": "node authorizer.test.integration.js | tap-spec"
+    "test": "blue-tape authorizer.test.integration.js | tap-spec"
   },
   "repository": {
     "type": "git",

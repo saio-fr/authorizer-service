@@ -34,5 +34,5 @@ Client.prototype.call = function(url, kwargs) {
 };
 
 module.exports = function(authId, password) {
-  return new TestContainer(Client, { authId: authId, password: password});
+  return new TestContainer(Client, { authId: authId, password: password });
 };

@@ -36,45 +36,53 @@ Service.prototype.start = function() {
   var procedures = {
     'service.admin.add': {
       procedure: function(args, kwargs, details) {
+        console.log(kwargs, details);
         return that.addAdmin(args, kwargs, details);
       }
     },
     'service.admin.remove': {
       procedure: function(args, kwargs, details) {
+        console.log(kwargs, details);
         return that.rmAdmin(args, kwargs, details);
       }
     },
     'service.company..customers.add': {
       procedure: function(args, kwargs, details) {
+        console.log(kwargs, details);
         return that.addCustomer(args, kwargs, details);
       },
       wildcard: true
     },
     'service.company..customers.remove': {
       procedure: function(args, kwargs, details) {
+        console.log(kwargs, details);
         return that.rmCustomer(args, kwargs, details);
       },
       wildcard: true
     },
     'service.company..buy': {
       procedure: function(args, kwargs, details) {
+        console.log(kwargs, details);
         return that.buy(args, kwargs, details);
       },
       wildcard: true
     },
     'service.me..password.set': {
       procedure: function(args, kwargs, details) {
+        console.log(kwargs, details);
         return that.setPassword(args, kwargs, details);
       },
       wildcard: true
     },
     'service.companies.get': {
       procedure: function(args, kwargs, details) {
+        console.log(kwargs, details);
         return that.getCompanies(args, kwargs, details);
       }
     },
     'service.company..stats.customers.count': {
       procedure: function(args, kwargs, details) {
+        console.log(kwargs, details);
         return that.countCustomers(args, kwargs, details);
       },
       wildcard: true
@@ -83,9 +91,10 @@ Service.prototype.start = function() {
 
   var pendingRegistrations = _.map(procedures, function(reg, url) {
     if (reg.wildcard) {
-      return that.ws.register(url, reg.procedure, { match: 'wildcard'});
+      return that.ws.register(url, reg.procedure, { match: 'wildcard' });
+    } else {
+      return that.ws.register(url, reg.procedure);
     }
-    that.ws.register(url, reg.procedure, { match: 'wildcard'});
   });
 
   return when.all(pendingRegistrations);

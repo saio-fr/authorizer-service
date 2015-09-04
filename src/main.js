@@ -156,6 +156,7 @@ Authorizer.prototype.can = function(authId, authRole, action, ressource) {
 
   grantedRoles = this.permissions.getRoles(action, ressource);
   if (_.isEmpty(grantedRoles)) {
+    console.log('false', 'empty granted roles');
     return false;
   }
 
@@ -166,11 +167,13 @@ Authorizer.prototype.can = function(authId, authRole, action, ressource) {
   });
 
   if (areDynamicRolesGranted) {
+    console.log('true', 'dynamic');
     return true;
   }
 
   // static roles defined only for registered users
   if (authRole !== 'registered') {
+    console.log('false', 'not registered');
     return false;
   }
 
@@ -181,6 +184,10 @@ Authorizer.prototype.can = function(authId, authRole, action, ressource) {
           return roles.isGranted(userRole, grantedRole);
         });
       });
+    })
+    .then(function(can) {
+      console.log(can, 'static');
+      return when.resolve(can);
     });
 };
 
@@ -236,15 +243,6 @@ Authorizer.prototype.getStaticRoles = function(authId, _keepRowRef) {
     }).catch(function() {
       // TODO log error
       return [];
-    });
-};
-
-// authRole optional (anonymous by default)
-Authorizer.prototype.getRoles = function(authId, authRole) {
-  var dynamicRoles = this.getDynamicRoles(authId, authRole);
-  return this.getStaticRoles(authId)
-    .then(function(staticRoles) {
-      return dynamicRoles.concat(staticRoles);
     });
 };
 
