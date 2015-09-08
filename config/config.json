@@ -17,7 +17,7 @@
   },
 
   "auth": {
-    "params": ["license", "threadId"],
+    "params": ["license", "thread"],
 
     "roles": [{
       "name": "Operator",
@@ -57,27 +57,23 @@
 
     "ressources": [{
       "name": "publicSendMessage",
-      "wsUrl": "fr.saio.api.public.licence..id..message.send",
-      "params": ["license", "authId"]
+      "wsUrl": "fr.saio.api.public.license..id..message.send.",
+      "params": ["license", "authId", "thread"]
     }, {
       "name": "privateSendMessage",
-      "wsUrl": "fr.saio.api.registered.licence..id..message.send.",
-      "params": ["license", "authId", "threadId"]
+      "wsUrl": "fr.saio.api.private.license..id..message.send.",
+      "params": ["license", "authId", "thread"]
     }, {
       "name": "publicRecvMessage",
-      "wsUrl": "fr.saio.api.public.licence..id..message",
+      "wsUrl": "fr.saio.api.public.license..id..message",
       "params": ["license", "authId"]
-    }, {
-      "name": "privateRecvMessage",
-      "wsUrl": "fr.saio.api.registered.licence..message.",
-      "params": ["license", "threadId"]
     }],
 
     "permissions": [{
       "role": "<SELF>",
       "action": "call",
       "ressource": "publicSendMessage",
-      "bypass": ["license"]
+      "bypass": ["license", "thread"]
     }, {
       "role": "<SELF>",
       "action": "subscribe",
@@ -87,13 +83,13 @@
       "role": "ChatOperator",
       "action": "call",
       "ressource": "privateSendMessage",
-      "bypass": ["visitorId"]
+      "bypass": ["thread"]
 
     }, {
       "role": "ChatOperator",
       "action": "subscribe",
-      "ressource": "privateRecvMessage",
-      "bypass": ["threadId"]
+      "ressource": "publicRecvMessage",
+      "bypass": ["authId"]
     }]
   }
 }
