@@ -4,36 +4,37 @@ Role-oriented authorization service with inheritance & parametrization handling.
 
 Procedures :
 ------------
-The service registers procedures in a crossbar router at URLs starting with a domain defined in the options or in the config.json file.
+The service registers procedures in a crossbar router at URLs starting with a domain defined in the options or in the **config/config.json** file.
 
 **_domain_.can** :
-* `kwargs.userId : String`  
+* `kwargs.authId : String`  
+* `kwargs.authRole : String 'anonymous' || 'registered'` *optional*, 'anonymous' by default  
 * `kwargs.action : String`  
 * `kwargs.ressource : Ressource`
 
-* `return : Boolean` true if *userId* can make *action* over *ressource*.
+* `return : Boolean` true if *authId* can make *action* over *ressource*.
 
 **_domain_.crossbar.can** : does the same job as .can() but wrapped for crossbar authorization.
-* `args[0] : String` crossbar authid  
+* `args[0] : String` crossbar session (contains 'authid' & 'authrole' keys)  
 * `args[1] : String` wamp url  
 * `args[2] : String` wamp action
 
 * `return : Boolean` true if authorized
 
 **_domain_.roles.get** :
-* `kwargs.userId : String`
+* `kwargs.authId : String`
 
-* `return : [Role]` array of roles affected to *userId*,  
-  does not return <ANONYMOUS> & <SELF> instances (see the config.auth.roles part of the doc).
+* `return : [Role]` array of roles affected to *authId*,  
+  does not return `<ANONYMOUS>`, `<SELF>` & `<REGISTERED>` instances (see the config.auth.roles part of the doc).
 
 **_domain_.roles.add** :
-* `kwargs.userId : String`  
+* `kwargs.authId : String`  
 * `kwargs.role : Role`
 
 * `return : Boolean` true if role successfully added.
 
 **_domain_.roles.remove** :
-* `kwargs.userId : String`  
+* `kwargs.authId : String`  
 * `kwargs.role : Role`
 
 * `return : Boolean` true if role successfully removed.
@@ -42,7 +43,7 @@ Objects :
 ---------
 **Role** :
 * `name : String`  
-* `params : Object { paramName : String paramValue }`, *optional*
+* `params : Object { paramName : String paramValue }` *optional*
 
 **Ressource** :
 * `name : String`  
@@ -54,7 +55,7 @@ Objects :
 
 Config :
 --------
-The configuration of the service is mainly done in a file called **config.json** (the db & ws part can also be done in the service options). The config file must be in your working directory when you start the service (see *Install & run the service*). You can find a config file example at example/authorizer/config.json.
+The configuration of the service is mainly done in a file called **config.json** (the db & ws part can also be done in the service options). The config file must be located at **./config/config.json** when you start the service (see *Install & run the service*). You can find a config file example at example/authorizer/config.json.
 
 ```js
 {
@@ -72,7 +73,7 @@ The configuration of the service is mainly done in a file called **config.json**
 
   /* config of the wsocket-component for accessing the crossbar router,
    * plus the domain field (prefix url for registering the procedures of the service).
-   * See the Procedures part of the doc & the ws-component doc.
+   * See the Procedures part of the doc & the wsocket-component doc.
    */
   "ws": {
     "url": String,
@@ -89,10 +90,10 @@ The configuration of the service is mainly done in a file called **config.json**
   "auth": {
 
     /* Array of parameter names used in roles & ressources.
-     * params must NOT contain "userId" or "name".
-     * "userId" is a default parameter, it can be used in roles & ressources like other parameters.
+     * params must NOT contain "authId" or "name".
+     * "authId" is a default parameter, it can be used in roles & ressources like other parameters.
      * It will also define the column names in the "Roles" table in the database, which will have
-     * these columns : "userId" | "name" (of the role) | params[0] | ...
+     * these columns : "authId" | "name" (of the role) | params[0] | ...
      */
     "params": Array(String),
 
@@ -113,20 +114,29 @@ The configuration of the service is mainly done in a file called **config.json**
      *       So, (parentSchema.params - bypass) must be included in childSchema.params
      * }
      *
-     * There are 2 default schemas in the authorizer : (they must not be overwritten)
+     * There are 3 default schemas in the authorizer : (they must not be overwritten)
      * { "name": "<ANONYMOUS>" }
      * and
      * {
      *   "name": "<SELF>",
-     *   "params": ["userId"]
+     *   "params": ["authId"]
      * }
-     * userId in <SELF> is instanciated with kwargs.userId in the .can() procedure
+     * and
+     * {
+     * 	"name": "<REGISTERED>",
+     * 	"params": ["authId"]
+     * }
+     *
+     * Those 3 roles are not stored in the database, they are instanciated dynamically at .can() calls.
+     * These schema can be used in permissions and extended, like any other role schema.
+     * But extending them is pretty much useless, and believe me, you should avoid it (anti-pattern)
+     *
+     * authId in <SELF> & <REGISTERED> is instanciated with kwargs.authId in the .can() procedure
      * or with args[0] (aka authid of wamp) in the .crossbar.can() procedure.
      * <SELF> can be used to handle personal stuff like password or preferences...
      *
-     * Every user has those 2 roles, they are not stored in the Roles db.
-     * These schema can be used in permissions and extended, like any other role schema.
-     * (but extending them is pretty much useless, and believe me, you should avoid it)
+     * Every user has an instance of <ANONYMOUS> & <SELF>.  
+     * Every user which has authRole == 'registered' has an instance of the <REGISTERED> role.
      */
     "roles": Array(RoleSchema),
 
@@ -186,33 +196,22 @@ Some fields in the config file (in the ws & db parts) can also be defined as opt
 Install & run the service :
 ---------------------------
 ```bash
-# you need to be logged in npm
-# & have access to the @saio scope
-$ npm install -g @saio/service-runner
-
-# install from npm registry
-$ npm install -g @saio/authorizer-service
-
-# install from source
 $ cd path/to/authorizer/package.json
-$ npm install -g .
-
-# run
-$ cd path/to/config.json
-$ service-runner authorizer-service [--options]
+$ npm install
+# config parsed from path/to/authorizer/config/config.json
+$ npm start -- [--options]
 ```
 
 Test :
 ------
-The unit test files (in spec/) are for the files in core/ and model/. The main file authorizer.js is not unit tested. It is tested in an "real" environment ie a database, a crossbar middleware, services and test clients (see example/).
+The test files are in test/. src/main.js and src/configBuilder.js are not unit tested. The whole service is tested in a "real" environment ie with a database, a crossbar middleware, services and test clients (see test/integration & tasks/integration).  
 ```bash
-$ export NODE_ENV=dev
 $ npm install
 
-# run the unit tests :
+# unit tests :
 $ npm test
 
-# run the example (aka authorizer.js test)
+# integration tests :
 # you need to have Docker installed
-$ npm run example
+$ npm run test.integration
 ```

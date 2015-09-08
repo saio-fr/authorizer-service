@@ -1,1 +1,99 @@
-{}
+{
+  "db": {
+    "dialect": "mysql",
+    "user": "root",
+    "password": "",
+    "host": "localhost",
+    "port": "3306",
+    "dbname": "authorizer"
+  },
+
+  "ws": {
+    "url": "ws://localhost:314159265359/faudra/un/meilleur/port/que/pi/",
+    "realm": "saio",
+    "domain": "fr.saio.service.authorizer",
+    "authId": "service",
+    "password": "service"
+  },
+
+  "auth": {
+    "params": ["license", "visitorId"],
+
+    "roles": [{
+      "name": "Operator",
+      "params": ["license"]
+    }, {
+      "name": "ChatOperator",
+      "params": ["license"],
+      "extends": [{"name": "Operator"}]
+    }, {
+      "name": "KnowledgeOperator",
+      "params": ["license"],
+      "extends": [{"name": "Operator"}]
+    }, {
+      "name": "Admin",
+      "params": ["license"],
+      "extends": [{"name": "ChatOperator"}, {"name": "KnowledgeOperator"}]
+    }, {
+      "name": "Integrator",
+      "params": ["license"],
+      "extends": [{
+        "name": "Admin"
+      }]
+    }, {
+      "name": "Partner"
+    }, {
+      "name": "SysAdmin",
+      "extends": [{
+        "name": "Integrator",
+        "bypass": ["license"]
+      }, {
+        "name": "Admin",
+        "bypass": ["license"]
+      }]
+    }],
+
+    "actions": ["publish", "subscribe", "call", "register"],
+
+    "ressources": [{
+      "name": "publicSendMessage",
+      "wsUrl": "fr.saio.api.public.licence..id..message.send",
+      "params": ["license", "authId"]
+    }, {
+      "name": "privateSendMessage",
+      "wsUrl": "fr.saio.api.registered.licence..id..message.send.",
+      "params": ["license", "authId", "visitorId"]
+    }, {
+      "name": "publicRecvMessage",
+      "wsUrl": "fr.saio.api.public.licence..id..message",
+      "params": ["license", "authId"]
+    }, {
+      "name": "privateRecvMessage",
+      "wsUrl": "fr.saio.api.registered.licence..message.",
+      "params": ["license", "visitorId"]
+    }],
+
+    "permissions": [{
+      "role": "<SELF>",
+      "action": "call",
+      "ressource": "publicSendMessage",
+      "bypass": ["license"]
+    }, {
+      "role": "<SELF>",
+      "action": "subscribe",
+      "ressource": "publicRecvMessage",
+      "bypass": ["license"]
+    }, {
+      "role": "ChatOperator",
+      "action": "call",
+      "ressource": "privateSendMessage",
+      "bypass": ["visitorId"]
+
+    }, {
+      "role": "ChatOperator",
+      "action": "subscribe",
+      "ressource": "privateRecvMessage",
+      "bypass": ["visitorId"]
+    }]
+  }
+}
