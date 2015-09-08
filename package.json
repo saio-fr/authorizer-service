@@ -20,14 +20,16 @@
   },
   "scripts": {
     "start": "service-runner src/main.js",
-    "test": "eslint . && jscs . && bash tasks/test.sh",
-    "test.integration": "bash tasks/test.integration.sh"
+    "pretest": "eslint . && jscs .",
+    "test": "blue-tape test/**/*.test.js | tap-spec",
+    "test.integration": "bash tasks/test.integration.sh",
+    "test.integration.clean": "bash tasks/test.integration.clean.sh"
   },
   "repository": {
     "type": "git",
     "url": "git@github.com:saio-fr/authorizer-service.git"
   },
-  "author": "Alexis Terrat",
+  "author": "saio",
   "bugs": {
     "url": "https://github.com/saio-fr/authorizer-service/issues"
   },

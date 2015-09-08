@@ -2,7 +2,7 @@ FROM auth-base
 
 WORKDIR /opt/service
 ADD test/integration/helpers/service.js ./
-ADD tasks/integration/config/service.package.json ./package.json
+ADD test/integration/config/service.package.json ./package.json
 
 RUN npm install
 ENTRYPOINT ["npm", "start", "--"]

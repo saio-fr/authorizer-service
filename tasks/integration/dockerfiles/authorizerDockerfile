@@ -5,7 +5,7 @@ WORKDIR /opt/service
 ADD src ./src
 ADD model ./model
 ADD package.json ./package.json
-ADD tasks/integration/config/authorizer.config.json ./config/config.json
+ADD test/integration/config/authorizer.config.json ./config/config.json
 
 RUN npm install
 ENTRYPOINT ["npm", "start", "--"]

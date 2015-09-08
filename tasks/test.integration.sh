@@ -1,11 +1,11 @@
 #!/bin/env bash
 
 # install
-docker build -t auth-base -f tasks/integration/baseDockerfile .;
-docker build -t auth-crossbar -f tasks/integration/crossbarDockerfile .;
-docker build -t auth-authorizer -f tasks/integration/authorizerDockerfile .;
-docker build -t auth-service -f tasks/integration/serviceDockerfile .;
-docker build -t auth-test -f tasks/integration/testDockerfile .;
+docker build -t auth-base -f tasks/integration/dockerfiles/baseDockerfile .;
+docker build -t auth-crossbar -f tasks/integration/dockerfiles/crossbarDockerfile .;
+docker build -t auth-authorizer -f tasks/integration/dockerfiles/authorizerDockerfile .;
+docker build -t auth-service -f tasks/integration/dockerfiles/serviceDockerfile .;
+docker build -t auth-test -f tasks/integration/dockerfiles/testDockerfile .;
 
 # start services
 echo "starting database...";
@@ -45,26 +45,6 @@ docker run \
   --link auth-crossbar:crossbar \
   auth-test;
 TEST_EC=$?;
-
-# stop
-docker stop auth-service;
-docker stop auth-authorizer;
-docker stop auth-crossbar;
-docker stop auth-db;
-
-# clean
-docker rm auth-test;
-docker rm auth-service;
-docker rm auth-authorizer;
-docker rm auth-crossbar;
-docker rm auth-db;
-
-# uninstall
-docker rmi auth-test;
-docker rmi auth-service;
-docker rmi auth-authorizer;
-docker rmi auth-crossbar;
-docker rmi auth-base;
 
 # return with the exit code of the test
 if [ $TEST_EC -eq 0 ]
