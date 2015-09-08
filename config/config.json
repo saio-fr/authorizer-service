@@ -9,7 +9,7 @@
   },
 
   "ws": {
-    "url": "ws://localhost:314159265359/faudra/un/meilleur/port/que/pi/",
+    "url": "ws://localhost:8081",
     "realm": "saio",
     "domain": "fr.saio.service.authorizer",
     "authId": "service",
@@ -17,7 +17,7 @@
   },
 
   "auth": {
-    "params": ["license", "visitorId"],
+    "params": ["license", "threadId"],
 
     "roles": [{
       "name": "Operator",
@@ -62,7 +62,7 @@
     }, {
       "name": "privateSendMessage",
       "wsUrl": "fr.saio.api.registered.licence..id..message.send.",
-      "params": ["license", "authId", "visitorId"]
+      "params": ["license", "authId", "threadId"]
     }, {
       "name": "publicRecvMessage",
       "wsUrl": "fr.saio.api.public.licence..id..message",
@@ -70,7 +70,7 @@
     }, {
       "name": "privateRecvMessage",
       "wsUrl": "fr.saio.api.registered.licence..message.",
-      "params": ["license", "visitorId"]
+      "params": ["license", "threadId"]
     }],
 
     "permissions": [{
@@ -93,7 +93,7 @@
       "role": "ChatOperator",
       "action": "subscribe",
       "ressource": "privateRecvMessage",
-      "bypass": ["visitorId"]
+      "bypass": ["threadId"]
     }]
   }
 }
