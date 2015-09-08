@@ -31,23 +31,18 @@ var Roles = require('./roles.js');
 var Ressources = require('./ressources.js');
 var Permissions = require('./permissions.js');
 
+var Config = require('./config.js');
+
 var Authorizer = function(container, options) {
-  var configPath = path.resolve(process.env.PWD, 'config/config.json');
-  var config;
-  try {
-    config = require(configPath);
-  } catch (e) {
-    throw new Error('config file not found !');
-  }
 
   // complete config with options & validate (may throw)
-  config = ConfigBuilder.build(config, options);
+  config = Config.build(options);
 
   this.params = new Params(config.auth.params);
   this.roles = new Roles(this.params, config.auth.roles);
   this.ressources = new Ressources(this.params, config.auth.ressources);
   this.permissions = new Permissions(this.roles, config.auth.actions, this.ressources,
-    this.params, config.auth.permissions);
+  this.params, config.auth.permissions);
 
   this.wsDomain = config.ws.domain;
 
