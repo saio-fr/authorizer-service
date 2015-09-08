@@ -25,7 +25,6 @@ var when = require('when');
 var Db = require('@saio/db-component');
 var WSocket = require('@saio/wsocket-component');
 
-var ConfigBuilder = require('./configBuilder.js');
 var Params = require('./params.js');
 var Roles = require('./roles.js');
 var Ressources = require('./ressources.js');

@@ -5,7 +5,9 @@ var _ = require('underscore');
 function complete(config) {
   config = _.defaults(config, {
     ws: {},
-    db: {}
+    db: {},
+    logger: {},
+    auth: {}
   });
 
   config.ws = _.defaults(config.ws, {
@@ -22,6 +24,49 @@ function complete(config) {
     host: undefined,
     port: undefined,
     dbname: undefined
+  });
+
+  config.db.model = './model/role.js';
+
+  config.logger = _.defaults(config.logger, {
+    // TODO
+  });
+
+  config.auth = _.defaults(config.auth, {
+    params: [],
+    roles: [],
+    actions: [],
+    ressources: [],
+    permissions: []
+  });
+
+  // check reserved params ('authId' & 'name')
+  _.each(config.auth.params, function(param) {
+    if (param === 'authId' || param === 'name') {
+      throw new Error('invalid param config');
+    }
+  });
+
+  // check reserved roles ('<ANONYMOUS>', '<SELF>' & '<REGISTERED>')
+  _.each(config.auth.roles, function(role) {
+    var name = role.name;
+    if (name === '<ANONYMOUS>' || name === '<SELF>' || name === '<REGISTERED>') {
+      throw new Error('invalid role config');
+    }
+  });
+
+  // add reserved roles & params
+  config.auth.params.push('authId');
+  config.auth.roles.push({
+    name: '<ANONYMOUS>'
+  });
+  config.auth.roles.push({
+    name: '<SELF>',
+    params: ['authId']
+  });
+  config.auth.roles.push({
+    name: '<REGISTERED>',
+    params: ['authId']
   });
 }
 
