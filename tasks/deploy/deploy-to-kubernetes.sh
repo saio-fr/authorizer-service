@@ -38,5 +38,5 @@ if [ $($KUBERNETES_CMD get rc | grep -c authorizer) -ne 1 ]; then
     $KUBERNETES_CMD create -f tasks/deploy/authorizer-controller.yml
 else
     echo "Rolling update authorizer rc"
-    $KUBERNETES_CMD rolling-update authorizer --update-period=10s --image=${EXTERNAL_REGISTRY_ENDPOINT}/authorizer:${CIRCLE_BRANCH}_${CIRCLE_SHA1}
+    $KUBERNETES_CMD rolling-update authorizer --update-period=10s --image=${EXTERNAL_REGISTRY_ENDPOINT}/authorizer:${CIRCLE_BRANCH}
 fi

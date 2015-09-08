@@ -8,7 +8,6 @@ metadata:
   labels:
     name: authorizer
     branch: ${CIRCLE_BRANCH}
-    commit: ${CIRCLE_SHA1}
 spec:
   replicas: ${REPLICAS_NUMBER}
   # selector identifies the set of pods that this
@@ -29,8 +28,8 @@ spec:
       containers:
       - name: authorizer
         command: ["npm", "start", "--"]
-        args: ["--ws-url", "ws://crossbar-private:8081", "--db-host", "10.240.21.210"]
-        image: eu.gcr.io/saio-fr/authorizer:${CIRCLE_BRANCH}_${CIRCLE_SHA1}
+        args: ["--ws-url", "ws://crossbar-private:8081", "--db-host", "memsql"]
+        image: eu.gcr.io/saio-fr/authorizer:${CIRCLE_BRANCH}
         ports:
         - containerPort: 8081
 

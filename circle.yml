@@ -21,8 +21,8 @@ deployment:
     branch: [master, develop]
     commands:
       - if [[ -e ~/docker/image.tar ]]; then docker load --input ~/docker/image.tar; fi
-      - docker build -t ${EXTERNAL_REGISTRY_ENDPOINT}/authorizer:${CIRCLE_BRANCH}_${CIRCLE_SHA1} .
-      - mkdir -p ~/docker; docker save ${EXTERNAL_REGISTRY_ENDPOINT}/authorizer:${CIRCLE_BRANCH}_${CIRCLE_SHA1} > ~/docker/image.tar
+      - docker build -t ${EXTERNAL_REGISTRY_ENDPOINT}/authorizer:${CIRCLE_BRANCH} .
+      - mkdir -p ~/docker; docker save ${EXTERNAL_REGISTRY_ENDPOINT}/authorizer:${CIRCLE_BRANCH} > ~/docker/image.tar
       - chmod +x tasks/deploy/auth-gcloud.sh && tasks/deploy/auth-gcloud.sh
-      - gcloud docker push ${EXTERNAL_REGISTRY_ENDPOINT}/authorizer:${CIRCLE_BRANCH}_${CIRCLE_SHA1} > /dev/null
+      - gcloud docker push ${EXTERNAL_REGISTRY_ENDPOINT}/authorizer:${CIRCLE_BRANCH} > /dev/null
       - chmod +x tasks/deploy/deploy-to-kubernetes.sh && tasks/deploy/deploy-to-kubernetes.sh
