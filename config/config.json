@@ -21,29 +21,31 @@
 
     "roles": [{
       "name": "Operator",
-      "params": ["license"]
+      "params": ["license", "authId"]
     }, {
       "name": "ChatOperator",
-      "params": ["license"],
+      "params": ["license", "authId"],
       "extends": [{"name": "Operator"}]
     }, {
       "name": "KnowledgeOperator",
-      "params": ["license"],
+      "params": ["license", "authId"],
       "extends": [{"name": "Operator"}]
     }, {
       "name": "Admin",
-      "params": ["license"],
+      "params": ["license", "authId"],
       "extends": [{"name": "ChatOperator"}, {"name": "KnowledgeOperator"}]
     }, {
       "name": "Integrator",
-      "params": ["license"],
+      "params": ["license", "authId"],
       "extends": [{
         "name": "Admin"
       }]
     }, {
-      "name": "Partner"
+      "name": "Partner",
+      "params": ["authId"]
     }, {
       "name": "SysAdmin",
+      "params": ["authId"],
       "extends": [{
         "name": "Integrator",
         "bypass": ["license"]
@@ -84,7 +86,6 @@
       "action": "call",
       "ressource": "privateSendMessage",
       "bypass": ["thread"]
-
     }, {
       "role": "ChatOperator",
       "action": "subscribe",
