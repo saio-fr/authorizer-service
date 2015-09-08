@@ -29,7 +29,7 @@ spec:
       containers:
       - name: authorizer
         command: ["npm", "start", "--"]
-        args: ["--ws-url", "ws://crossbar-private:8081"]
+        args: ["--ws-url", "ws://crossbar-private:8081", "--db-host", "10.240.21.210"]
         image: eu.gcr.io/saio-fr/authorizer:${CIRCLE_BRANCH}_${CIRCLE_SHA1}
         ports:
         - containerPort: 8081
