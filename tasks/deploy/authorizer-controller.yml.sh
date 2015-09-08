@@ -29,7 +29,7 @@ spec:
       - name: authorizer
         command: ["npm", "start", "--"]
         args: ["--ws-url", "ws://crossbar-private:8081", "--db-host", "memsql"]
-        image: eu.gcr.io/saio-fr/authorizer:${CIRCLE_BRANCH}
+        image: eu.gcr.io/saio-fr/authorizer:${CIRCLE_BRANCH}.${CIRCLE_SHA1}
         ports:
         - containerPort: 8081
 
