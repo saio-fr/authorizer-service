@@ -25,7 +25,7 @@ deployment:
     branch: [master, develop]
     commands:
       - chmod +x tasks/deploy/auth-gcloud.sh && tasks/deploy/auth-gcloud.sh
-      - gcloud docker tag ${EXTERNAL_REGISTRY_ENDPOINT}/authorizer:${CIRCLE_BRANCH}.${CIRCLE_SHA1} ${EXTERNAL_REGISTRY_ENDPOINT}/authorizer:${CIRCLE_BRANCH} -f
-      - gcloud docker push ${EXTERNAL_REGISTRY_ENDPOINT}/authorizer:${CIRCLE_BRANCH}.${CIRCLE_SHA1} > /dev/null
-      - gcloud docker push ${EXTERNAL_REGISTRY_ENDPOINT}/authorizer:${CIRCLE_BRANCH} > /dev/null
+      - gcloud docker -- tag -f ${EXTERNAL_REGISTRY_ENDPOINT}/authorizer:${CIRCLE_BRANCH}.${CIRCLE_SHA1} ${EXTERNAL_REGISTRY_ENDPOINT}/authorizer:${CIRCLE_BRANCH}
+      - gcloud docker -- push ${EXTERNAL_REGISTRY_ENDPOINT}/authorizer:${CIRCLE_BRANCH}.${CIRCLE_SHA1} > /dev/null
+      - gcloud docker -- push ${EXTERNAL_REGISTRY_ENDPOINT}/authorizer:${CIRCLE_BRANCH} > /dev/null
       - chmod +x tasks/deploy/deploy-to-kubernetes.sh && tasks/deploy/deploy-to-kubernetes.sh
