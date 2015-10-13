@@ -147,8 +147,8 @@ tape('Ressources.has/get', function(t) {
 
   rName = undefined;
   expected = undefined;
-  t.notOk(hasHelper(), 'undefined ressource');
-  t.deepEqual(getHelper(), expected, 'undefined ressource');
+  t.throws(hasHelper, 'undefined ressource');
+  t.throws(getHelper, 'undefined ressource');
 
   rName = 'r2';
   expected = res[2];
@@ -250,7 +250,7 @@ tape('Ressource.validate', function(t) {
   r = {
     wsUrl: 'a.p2..c'
   };
-  t.notOk(ressources.validate(r), msg);
+  t.throws(ressources.validate.bind(ressources, r), msg);
 
   msg = 'ressource with known & exact url';
   r = {

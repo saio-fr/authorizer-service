@@ -46,12 +46,12 @@ WsUrlParser.prototype.get = function(wsUrl) {
   var matchParams;
 
   if (!_.isString(wsUrl)) {
-    return;
+    throw new Error('invalid ressource url');
   }
 
   units = wsUrl.split('.');
   if (_.contains(units, '')) {
-    return;
+    throw new Error('invalid ressource url');
   }
 
   nUnits = units.length;

@@ -171,10 +171,10 @@ tape('WsUrlParser.get', function(t) {
   t.test('in empty parser', function(st) {
     var parser = new WsUrlParser();
 
-    st.notOk(parser.get(), 'undefined url');
-    st.notOk(parser.get(''), 'empty url');
+    st.throws(parser.get.bind(parser), 'undefined url');
+    st.throws(parser.get.bind(parser, ''), 'empty url');
+    st.throws(parser.get.bind(parser, 'a..c'), 'url with wildcard');
     st.notOk(parser.get('a.b.c'), 'defined url');
-    st.notOk(parser.get('a..c'), 'url with wildcard');
 
     st.end();
   });

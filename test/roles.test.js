@@ -757,18 +757,18 @@ tape('Roles.instanciateRow', function(t) {
 
   row = undefined;
   expected = undefined;
-  t.deepEqual(roles.instanciateRow(row), expected, 'undefined row');
+  t.throws(roles.instanciateRow.bind(roles, row), 'undefined row');
 
   row = {};
   expected = undefined;
-  t.deepEqual(roles.instanciateRow(row), expected, 'empty row');
+  t.throws(roles.instanciateRow.bind(roles, row), 'empty row');
 
   row = {
     authId: 'john doe',
     name: 'role42'
   };
   expected = undefined;
-  t.deepEqual(roles.instanciateRow(row), expected, 'row with unknown name');
+  t.throws(roles.instanciateRow.bind(roles, row), 'row with unknown name');
 
   row = {
     authId: 'john doe',
@@ -786,7 +786,7 @@ tape('Roles.instanciateRow', function(t) {
     p2: '2'
   };
   expected = undefined;
-  t.deepEqual(roles.instanciateRow(row), expected, 'row with missing params');
+  t.throws(roles.instanciateRow.bind(roles, row), 'row with missing params');
 
   row = {
     authId: 'john doe',
@@ -796,7 +796,7 @@ tape('Roles.instanciateRow', function(t) {
     p2: '2'
   };
   expected = undefined;
-  t.deepEqual(roles.instanciateRow(row), expected, 'row with invalid params');
+  t.throws(roles.instanciateRow.bind(roles, row), 'row with invalid params');
 
   row = {
     authId: 'john doe',
@@ -1018,7 +1018,7 @@ tape('Roles.export', function(t) {
     }
   };
   expected = undefined;
-  t.deepEqual(roles.export(authId, role), expected, 'role with wrong authId as param');
+  t.throws(roles.export.bind(roles, authId, role), 'role with wrong authId as param');
 
   t.end();
 });
@@ -1080,13 +1080,13 @@ tape('Roles.isGranted', function(t) {
   dest = {
     name: 'role0'
   };
-  t.notOk(roles.isGranted(src, dest), 'undefined src');
+  t.throws(roles.isGranted.bind(roles, src, dest), 'undefined src');
 
   src = {
     name: 'role0'
   };
   dest = undefined;
-  t.notOk(roles.isGranted(src, dest), 'undefined dest');
+  t.throws(roles.isGranted.bind(roles, src, dest), 'undefined dest');
 
   src = {
     name: 'role42'
@@ -1094,7 +1094,7 @@ tape('Roles.isGranted', function(t) {
   dest = {
     name: 'role0'
   };
-  t.notOk(roles.isGranted(src, dest), 'unkown src');
+  t.throws(roles.isGranted.bind(roles, src, dest), 'unkown src');
 
   src = {
     name: 'role0'
@@ -1102,7 +1102,7 @@ tape('Roles.isGranted', function(t) {
   dest = {
     name: 'role42'
   };
-  t.notOk(roles.isGranted(src, dest), 'unknown dest');
+  t.throws(roles.isGranted.bind(roles, src, dest), 'unknown dest');
 
   src = {
     name: 'role1',

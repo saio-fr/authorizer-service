@@ -75,8 +75,9 @@ tape('authorizer integration test', { timeout: 5000 }, function(t) {
       authId: 'marcel',
       role: { name: 'superAdmin' }
     })
-    .tap(function(success) {
-      st.ok(success, 'add role success');
+    .catch(function(err) {
+      console.log(err.message);
+      return when.reject(err);
     });
   });
 
@@ -85,6 +86,10 @@ tape('authorizer integration test', { timeout: 5000 }, function(t) {
     .tap(function(roles) {
       var expected = [{ name: 'superAdmin'}];
       st.deepEqual(roles, expected, 'get expected roles');
+    })
+    .catch(function(err) {
+      console.log(err.message);
+      return when.reject(err);
     });
   });
 
@@ -93,6 +98,10 @@ tape('authorizer integration test', { timeout: 5000 }, function(t) {
     .tap(function(roles) {
       var expected = [];
       st.deepEqual(roles, expected, 'get expected roles');
+    })
+    .catch(function(err) {
+      console.log(err.message);
+      return when.reject(err);
     });
   });
 
@@ -101,8 +110,9 @@ tape('authorizer integration test', { timeout: 5000 }, function(t) {
       authId: 'francois',
       companyId: 'cornichonfactory'
     })
-    .tap(function(success) {
-      st.ok(success, 'add role success');
+    .catch(function(err) {
+      console.log(err.message);
+      return when.reject(err);
     });
   });
 
@@ -114,6 +124,10 @@ tape('authorizer integration test', { timeout: 5000 }, function(t) {
         params: { companyId: 'cornichonfactory' }
       }];
       st.deepEqual(roles, expected, 'get expected roles');
+    })
+    .catch(function(err) {
+      console.log(err.message);
+      return when.reject(err);
     });
   });
 
@@ -121,8 +135,9 @@ tape('authorizer integration test', { timeout: 5000 }, function(t) {
     return clients.francois.service.call('service.company.cornichonfactory.customers.add', {
       authId: 'roger'
     })
-    .tap(function(success) {
-      st.ok(success, 'add role success');
+    .catch(function(err) {
+      console.log(err.message);
+      return when.reject(err);
     });
   });
 
@@ -130,6 +145,10 @@ tape('authorizer integration test', { timeout: 5000 }, function(t) {
     return clients.roger.service.call('service.company.cornichonfactory.buy')
     .tap(function() {
       st.pass('buy success');
+    })
+    .catch(function(err) {
+      console.log(err.message);
+      return when.reject(err);
     });
   });
 
@@ -137,8 +156,9 @@ tape('authorizer integration test', { timeout: 5000 }, function(t) {
     return clients.francois.service.call('service.company.cornichonfactory.customers.remove', {
       authId: 'roger'
     })
-    .tap(function(success) {
-      st.ok(success, 'remove customer success');
+    .catch(function(err) {
+      console.log(err.message);
+      return when.reject(err);
     });
   });
 
@@ -150,15 +170,16 @@ tape('authorizer integration test', { timeout: 5000 }, function(t) {
     .catch(function() {
       st.pass('buy fail');
       return when.resolve();
-    });
+    })
   });
 
   t.test('marcel add role customer(cornichonfactory) to rene', function(st) {
     return clients.marcel.service.call('service.company.cornichonfactory.customers.add', {
       authId: 'rene'
     })
-    .tap(function(success) {
-      st.ok(success, 'add role success');
+    .catch(function(err) {
+      console.log(err.message);
+      return when.reject(err);
     });
   });
 
@@ -166,8 +187,9 @@ tape('authorizer integration test', { timeout: 5000 }, function(t) {
     return clients.marcel.service.call('service.company.saucissonmarket.customers.add', {
       authId: 'rene'
     })
-    .tap(function(success) {
-      st.ok(success, 'add role success');
+    .catch(function(err) {
+      console.log(err.message);
+      return when.reject(err);
     });
   });
 
@@ -175,6 +197,10 @@ tape('authorizer integration test', { timeout: 5000 }, function(t) {
     return clients.rene.service.call('service.company.cornichonfactory.buy')
     .tap(function(success) {
       st.pass(success, 'buy success');
+    })
+    .catch(function(err) {
+      console.log(err.message);
+      return when.reject(err);
     });
   });
 
@@ -182,6 +208,10 @@ tape('authorizer integration test', { timeout: 5000 }, function(t) {
     return clients.rene.service.call('service.company.saucissonmarket.buy')
     .tap(function(success) {
       st.pass(success, 'buy success');
+    })
+    .catch(function(err) {
+      console.log(err.message);
+      return when.reject(err);
     });
   });
 
@@ -189,8 +219,9 @@ tape('authorizer integration test', { timeout: 5000 }, function(t) {
     return clients.marcel.service.call('service.company.saucissonmarket.customers.add', {
       authId: 'claude'
     })
-    .tap(function(success) {
-      st.ok(success, 'add customer success');
+    .catch(function(err) {
+      console.log(err.message);
+      return when.reject(err);
     });
   });
 
@@ -210,6 +241,10 @@ tape('authorizer integration test', { timeout: 5000 }, function(t) {
     .tap(function(result) {
       var expected = '********';
       st.equal(result, expected, 'set password success');
+    })
+    .catch(function(err) {
+      console.log(err.message);
+      return when.reject(err);
     });
   });
 
@@ -240,6 +275,10 @@ tape('authorizer integration test', { timeout: 5000 }, function(t) {
     .tap(function(companies) {
       var expected = ['saucissonmarket', 'cornichonfactory'];
       st.deepEqual(companies, expected, 'get companies success');
+    })
+    .catch(function(err) {
+      console.log(err.message);
+      return when.reject(err);
     });
   });
 
@@ -247,6 +286,10 @@ tape('authorizer integration test', { timeout: 5000 }, function(t) {
     return clients.marcel.service.call('service.company.saucissonmarket.stats.customers.count')
     .tap(function(nCustomers) {
       st.equal(nCustomers, 2, 'count customers success');
+    })
+    .catch(function(err) {
+      console.log(err.message);
+      return when.reject(err);
     });
   });
 
