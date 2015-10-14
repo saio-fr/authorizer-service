@@ -72,19 +72,19 @@ Roles.prototype.add = function(pattern) {
   var inPattern;
 
   if (!_.isObject(pattern) || !_.has(pattern, 'name')) {
-    throw new Error('invalid role pattern');
+    throw new Error('invalid role config');
   }
 
   name = pattern.name;
   if (this.has(name)) {
-    throw new Error('already have pattern');
+    throw new Error('already have role');
   }
 
   params = this.params;
   inPattern = { name: name };
   if (_.has(pattern, 'params')) {
     if (!params.isValid(pattern.params)) {
-      throw new Error('invalid role pattern');
+      throw new Error('invalid role config');
     }
 
     if (!_.isEmpty(pattern.params)) {
@@ -94,7 +94,7 @@ Roles.prototype.add = function(pattern) {
 
   if (_.has(pattern, 'extends')) {
     if (!_.isArray(pattern.extends) || _.isEmpty(pattern.extends)) {
-      throw new Error('invalid role pattern');
+      throw new Error('invalid role config');
     }
 
     inPattern.extends = {};
@@ -140,7 +140,7 @@ Roles.prototype.extends = function(childName, parentName) {
   var pattern;
 
   if (!this.has(childName) || !this.has(parentName)) {
-    throw new Error('invalid role name');
+    throw new Error('invalid role');
   }
 
   pattern = this.patterns[childName];
@@ -168,7 +168,7 @@ Roles.prototype.instanciateRow = function(row) {
     isRowValid = false;
   }
   if (!isRowValid) {
-    throw new Error('invalid row in Role database');
+    throw new Error('invalid row');
   }
 
   role = { name: name };
@@ -190,7 +190,7 @@ Roles.prototype.instanciateRow = function(row) {
   });
 
   if (undefParam) {
-    throw new Error('invalid row in Role database');
+    throw new Error('invalid row');
   }
 
   role.params = params;
@@ -336,7 +336,7 @@ Roles.prototype._validateAcyclic = function() {
         }
 
       } else if (nVisited[name] === maxNVisit) {
-        throw new Error('invalid config');
+        throw new Error('invalid role config');
       }
 
       ++nVisited[name];

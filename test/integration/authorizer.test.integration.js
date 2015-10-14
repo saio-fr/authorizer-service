@@ -61,6 +61,23 @@ function stop() {
   );
 }
 
+// return true if arrays a1 & a2 are equals (unordered) (values can be objects)
+function unorderedEqual(a1, a2) {
+  if (!_.isArray(a1) || !_.isArray(a2) || a1.length !== a2.length) {
+    return false;
+  }
+  var _a2 = _.clone(a2);
+  return _.every(a1, function(val1) {
+    for (var i = 0; i < _a2.length; ++i) {
+      if (_.isEqual(val1, _a2[i])) {
+        _a2.splice(i, 1);
+        return true;
+      }
+    }
+    return false;
+  });
+}
+
 tape('authorizer integration test', { timeout: 5000 }, function(t) {
 
   t.test('start clients', function(st) {
@@ -170,7 +187,7 @@ tape('authorizer integration test', { timeout: 5000 }, function(t) {
     .catch(function() {
       st.pass('buy fail');
       return when.resolve();
-    })
+    });
   });
 
   t.test('marcel add role customer(cornichonfactory) to rene', function(st) {
@@ -212,6 +229,181 @@ tape('authorizer integration test', { timeout: 5000 }, function(t) {
     .catch(function(err) {
       console.log(err.message);
       return when.reject(err);
+    });
+  });
+
+  t.test('remove all roles rene', function(st) {
+    return clients.internal.service.call('service.authorizer.roles.remove', { authId: 'rene' })
+    .then(function() {
+      return clients.internal.service.call('service.authorizer.roles.get', { authId: 'rene' });
+    })
+    .then(function(actualReneRoles) {
+      st.deepEqual(actualReneRoles, []);
+      return when.resolve();
+    });
+  });
+
+  t.test('add roles customer at cornichonfactory & saucissonmarket to rene', function(st) {
+    var rolesToAdd = [
+      {
+        name: 'customer',
+        params: { companyId: 'cornichonfactory' }
+      },
+      {
+        name: 'customer',
+        params: { companyId: 'saucissonmarket' }
+      }
+    ];
+    var expectedReneRoles = rolesToAdd;
+    return clients.internal.service.call('service.authorizer.roles.add',
+      { authId: 'rene', role: rolesToAdd })
+    .then(function() {
+      return clients.internal.service.call('service.authorizer.roles.get', { authId: 'rene' });
+    })
+    .then(function(actualReneRoles) {
+      st.ok(unorderedEqual(actualReneRoles, expectedReneRoles));
+      return when.resolve();
+    });
+  });
+
+  t.test('add roles admin at cornichonfactory & customer saucissonmarket to rene', function(st) {
+    var rolesToAdd = [
+      {
+        name: 'admin',
+        params: { companyId: 'cornichonfactory' }
+      },
+      {
+        name: 'customer',
+        params: { companyId: 'saucissonmarket' }
+      }
+    ];
+    var expectedReneRoles = [
+      {
+        name: 'admin',
+        params: { companyId: 'cornichonfactory' }
+      },
+      {
+        name: 'customer',
+        params: { companyId: 'saucissonmarket' }
+      }
+    ];
+    return clients.internal.service.call('service.authorizer.roles.add',
+      { authId: 'rene', role: rolesToAdd })
+    .then(function() {
+      return clients.internal.service.call('service.authorizer.roles.get', { authId: 'rene' });
+    })
+    .then(function(actualReneRoles) {
+      st.ok(unorderedEqual(actualReneRoles, expectedReneRoles));
+      return when.resolve();
+    });
+  });
+
+  t.test('add roles customer at cornichonfactory & admin saucissonmarket to rene', function(st) {
+    var rolesToAdd = [
+      {
+        name: 'customer',
+        params: { companyId: 'cornichonfactory' }
+      },
+      {
+        name: 'admin',
+        params: { companyId: 'saucissonmarket' }
+      }
+    ];
+    var expectedReneRoles = [
+      {
+        name: 'admin',
+        params: { companyId: 'cornichonfactory' }
+      },
+      {
+        name: 'admin',
+        params: { companyId: 'saucissonmarket' }
+      }
+    ];
+    return clients.internal.service.call('service.authorizer.roles.add',
+      { authId: 'rene', role: rolesToAdd })
+    .then(function() {
+      return clients.internal.service.call('service.authorizer.roles.get', { authId: 'rene' });
+    })
+    .then(function(actualReneRoles) {
+      st.ok(unorderedEqual(actualReneRoles, expectedReneRoles));
+      return when.resolve();
+    });
+  });
+
+  t.test('add roles customer at cornichonfactory & customer saucissonmarket to rene', function(st) {
+    var rolesToAdd = [
+      {
+        name: 'customer',
+        params: { companyId: 'cornichonfactory' }
+      },
+      {
+        name: 'customer',
+        params: { companyId: 'saucissonmarket' }
+      }
+    ];
+    var expectedReneRoles = [
+      {
+        name: 'admin',
+        params: { companyId: 'cornichonfactory' }
+      },
+      {
+        name: 'admin',
+        params: { companyId: 'saucissonmarket' }
+      }
+    ];
+    return clients.internal.service.call('service.authorizer.roles.add',
+      { authId: 'rene', role: rolesToAdd })
+    .then(function() {
+      return clients.internal.service.call('service.authorizer.roles.get', { authId: 'rene' });
+    })
+    .then(function(actualReneRoles) {
+      st.ok(unorderedEqual(actualReneRoles, expectedReneRoles));
+      return when.resolve();
+    });
+  });
+
+  t.test('add roles superAdmin & customer at cornichonfactory to rene', function(st) {
+    var rolesToAdd = [
+      {
+        name: 'superAdmin'
+      },
+      {
+        name: 'customer',
+        params: { companyId: 'cornichonfactory' }
+      }
+    ];
+    var expectedReneRoles = [
+      {
+        name: 'superAdmin'
+      }
+    ];
+    return clients.internal.service.call('service.authorizer.roles.add',
+      { authId: 'rene', role: rolesToAdd })
+    .then(function() {
+      return clients.internal.service.call('service.authorizer.roles.get', { authId: 'rene' });
+    })
+    .then(function(actualReneRoles) {
+      st.ok(unorderedEqual(actualReneRoles, expectedReneRoles));
+      return when.resolve();
+    });
+  });
+
+  t.test('set role customer at cornichonfactory to rene', function(st) {
+    var rolesToSet = [
+      {
+        name: 'customer',
+        params: { companyId: 'cornichonfactory' }
+      }
+    ];
+    var expectedReneRoles = rolesToSet;
+    return clients.internal.service.call('service.authorizer.roles.set',
+      { authId: 'rene', role: rolesToSet })
+    .then(function() {
+      return clients.internal.service.call('service.authorizer.roles.get', { authId: 'rene' });
+    })
+    .then(function(actualReneRoles) {
+      st.ok(unorderedEqual(actualReneRoles, expectedReneRoles));
+      return when.resolve();
     });
   });
 

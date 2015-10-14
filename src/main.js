@@ -248,18 +248,15 @@ Authorizer.prototype.addRoles = function(authId, rolesToAdd) {
       return i > j;
     });
   });
-  console.log('check0', rolesToAdd);
 
   return this.getStaticRoles(authId, true)
     .then(function(dbRoles) {
-      console.log(dbRoles);
       // do not add roles in rolesToAdd extended by roles in dbRoles
       rolesToAdd = _.reject(rolesToAdd, function(role) {
         return _.some(dbRoles, function(dbRole) {
           return roles.isGranted(dbRole, role);
         });
       });
-      console.log('check1', rolesToAdd.length);
 
       // remove roles in dbRoles extended by roles in rolesToAdd
       // note: pendingRemoves contains resolved promises for dbRoles to keep, it's harmless
@@ -276,15 +273,12 @@ Authorizer.prototype.addRoles = function(authId, rolesToAdd) {
         }
         return when.resolve();
       });
-      console.log('check2', pendingRemoves.length);
 
       // add roles in rolesToAdd to the db
       var pendingAdds = _.map(rolesToAdd, function(role) {
         var row;
-        console.log('check role export', role);
         try {
           row = roles.export(authId, role);
-          console.log('check3', row);
         } catch (err) {
           return when.reject(err);
         }
@@ -294,10 +288,7 @@ Authorizer.prototype.addRoles = function(authId, rolesToAdd) {
           });
       });
 
-      console.log('check3', pendingAdds.length);
-
       var pendingOps = _.flatten([pendingRemoves, pendingAdds], true);
-
       return when.all(pendingOps)
         .then(function() {
           return when.resolve();

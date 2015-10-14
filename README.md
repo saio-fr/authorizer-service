@@ -29,15 +29,30 @@ The service registers procedures in a crossbar router at URLs starting with a do
 
 **_domain_.roles.add** :
 * `kwargs.authId : String`  
-* `kwargs.role : Role`
+* `kwargs.role : Role or [Role]`
 
-* `return : Boolean` true if role successfully added.
+**_domain_.roles.set** : (overwrites current roles)
+* `kwargs.authId : String`  
+* `kwargs.role : Role or [Role]`
 
 **_domain_.roles.remove** :
 * `kwargs.authId : String`  
-* `kwargs.role : Role`
+* `kwargs.role : undefined, Role or [Role]`  
+    if undefined, removes all roles of authId
 
 * `return : Boolean` true if role successfully removed.
+
+Errors :
+--------
+Procedures calls can reject an Error if they fail. Those errors have the attribute `wamp : true` if they are emitted by the authorizer (see the @saio/wsocket doc).
+
+Error messages can be :
+* 'internal server error' or 'internal server error : *detail*',
+* 'invalid row', implicates an integrity error in the database
+* 'invalid authId'
+* 'invalid ressource' or 'invalid ressource url'
+* 'invalid role'
+* 'invalid action'
 
 Objects :
 ---------
