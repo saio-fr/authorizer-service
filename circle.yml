@@ -10,6 +10,7 @@ dependencies:
   override:
     - echo $NPM_TOKEN > ~/.npmrc
     - npm install
+    - chmod +x tasks/deploy/auth-gcloud.sh && tasks/deploy/auth-gcloud.sh
     - if [[ -e ~/docker/image.tar ]]; then docker load --input ~/docker/image.tar; fi
     - docker build -t ${EXTERNAL_REGISTRY_ENDPOINT}/authorizer:${CIRCLE_BRANCH}.${CIRCLE_SHA1} .
     - mkdir -p ~/docker; docker save ${EXTERNAL_REGISTRY_ENDPOINT}/authorizer:${CIRCLE_BRANCH}.${CIRCLE_SHA1} > ~/docker/image.tar
@@ -24,7 +25,6 @@ deployment:
   kubernetes:
     branch: [master, develop]
     commands:
-      - chmod +x tasks/deploy/auth-gcloud.sh && tasks/deploy/auth-gcloud.sh
       - gcloud docker -- tag -f ${EXTERNAL_REGISTRY_ENDPOINT}/authorizer:${CIRCLE_BRANCH}.${CIRCLE_SHA1} ${EXTERNAL_REGISTRY_ENDPOINT}/authorizer:${CIRCLE_BRANCH}
       - gcloud docker -- push ${EXTERNAL_REGISTRY_ENDPOINT}/authorizer:${CIRCLE_BRANCH}.${CIRCLE_SHA1} > /dev/null
       - gcloud docker -- push ${EXTERNAL_REGISTRY_ENDPOINT}/authorizer:${CIRCLE_BRANCH} > /dev/null
