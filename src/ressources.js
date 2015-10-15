@@ -31,11 +31,14 @@ var Ressources = function(params, ressources) {
 };
 
 Ressources.prototype.has = function(name) {
+  if (!_.isString(name) || _.isEmpty(name)) {
+    throw new Error('invalid ressource');
+  }
   return _.isString(name) && _.has(this._ressources, name);
 };
 
 Ressources.prototype.get = function(name) {
-  if (_.isString(name)) {
+  if (this.has(name)) {
     return this._ressources[name];
   }
 };

@@ -52,20 +52,17 @@ var Roles = function(params, roles) {
 };
 
 Roles.prototype.has = function(patternName) {
-  if (!_.isString(patternName)) {
-    return false;
+  if (!_.isString(patternName) || _.isEmpty(patternName)) {
+    throw new Error('invalid role');
   }
   return _.has(this.patterns, patternName);
 };
 
 Roles.prototype.get = function(patternName) {
   var pattern;
-
-  if (_.isString(patternName)) {
+  if (this.has(patternName)) {
     pattern = this.patterns[patternName];
-    if (!_.isUndefined(pattern)) {
-      return _.pick(pattern, 'name', 'params');
-    }
+    return _.pick(pattern, 'name', 'params');
   }
 };
 
@@ -75,19 +72,19 @@ Roles.prototype.add = function(pattern) {
   var inPattern;
 
   if (!_.isObject(pattern) || !_.has(pattern, 'name')) {
-    throw new Error('invalid role pattern');
+    throw new Error('invalid role config');
   }
 
   name = pattern.name;
   if (this.has(name)) {
-    throw new Error('already have pattern');
+    throw new Error('already have role');
   }
 
   params = this.params;
   inPattern = { name: name };
   if (_.has(pattern, 'params')) {
     if (!params.isValid(pattern.params)) {
-      throw new Error('invalid role pattern');
+      throw new Error('invalid role config');
     }
 
     if (!_.isEmpty(pattern.params)) {
@@ -97,7 +94,7 @@ Roles.prototype.add = function(pattern) {
 
   if (_.has(pattern, 'extends')) {
     if (!_.isArray(pattern.extends) || _.isEmpty(pattern.extends)) {
-      throw new Error('invalid role pattern');
+      throw new Error('invalid role config');
     }
 
     inPattern.extends = {};
@@ -143,7 +140,7 @@ Roles.prototype.extends = function(childName, parentName) {
   var pattern;
 
   if (!this.has(childName) || !this.has(parentName)) {
-    return;
+    throw new Error('invalid role');
   }
 
   pattern = this.patterns[childName];
@@ -154,7 +151,7 @@ Roles.prototype.extends = function(childName, parentName) {
   return pattern.extends[parentName];
 };
 
-// instanciate a role from a sequelize Role instance, return undefined if row doesnt match pattern
+// instanciates & returns a role from a sequelize Role.datavalues instance
 Roles.prototype.instanciateRow = function(row) {
   var role;
   var name;
@@ -162,14 +159,16 @@ Roles.prototype.instanciateRow = function(row) {
   var paramNames;
   var pattern;
   var undefParam;
+  var isRowValid;
 
-  if (!_.has(row, 'name')) {
-    return;
+  try {
+    name = row.name;
+    isRowValid = this.has(name);
+  } catch (err) {
+    isRowValid = false;
   }
-
-  name = row.name;
-  if (!this.has(name)) {
-    return;
+  if (!isRowValid) {
+    throw new Error('invalid row');
   }
 
   role = { name: name };
@@ -191,7 +190,7 @@ Roles.prototype.instanciateRow = function(row) {
   });
 
   if (undefParam) {
-    return;
+    throw new Error('invalid row');
   }
 
   role.params = params;
@@ -199,7 +198,7 @@ Roles.prototype.instanciateRow = function(row) {
 };
 
 // flatten the possible params so a sequelize Role instance can be built from that
-// we suppose that the role has been validated
+// we suppose that the role has been validated & authId too
 Roles.prototype.export = function(authId, role) {
   var row = {
     authId: authId,
@@ -208,7 +207,7 @@ Roles.prototype.export = function(authId, role) {
 
   if (_.has(role, 'params')) {
     if (_.has(role.params, 'authId') && authId !== role.params.authId) {
-      return;
+      throw new Error('invalid role');
     }
     _.extendOwn(row, role.params);
   }
@@ -254,13 +253,13 @@ Roles.prototype.isGranted = function(srcRole, destRole) {
 
   if (!_.isObject(srcRole) || !_.isObject(destRole) ||
       !_.has(srcRole, 'name') || !_.has(destRole, 'name')) {
-    return false;
+    throw new Error('invalid role');
   }
 
   srcName = srcRole.name;
   destName = destRole.name;
   if (!this.has(srcName) || !this.has(destName)) {
-    return false;
+    throw new Error('invalid role');
   }
 
   patterns = this.patterns;
@@ -337,7 +336,7 @@ Roles.prototype._validateAcyclic = function() {
         }
 
       } else if (nVisited[name] === maxNVisit) {
-        throw new Error('invalid config');
+        throw new Error('invalid role config');
       }
 
       ++nVisited[name];

@@ -337,14 +337,7 @@ tape('Permissions.getRoles', function(t) {
     name: 'ressource0'
   };
   expected = [];
-  t.ok(helper(), 'unknown action');
-
-  action = 'a1';
-  ressource = {
-    name: 'ressource3'
-  };
-  expected = [];
-  t.ok(helper(), 'unknown ressource');
+  t.throws(helper, 'unknown action');
 
   action = 'a0';
   ressource = {

@@ -48,7 +48,6 @@ var Authorizer = function(container, options) {
   //this.logger = container.use('logger', Logger, config.logger);
   this.ws = container.use('ws', WSocket, config.ws);
   this.db = container.use('db', Db, config.db);
-
 };
 
 Authorizer.prototype.start = function() {
@@ -69,49 +68,35 @@ Authorizer.prototype.start = function() {
       }
     },
     '.can': function(args, kwargs) {
-      try {
-        var authId = kwargs.authId;
-        var authRole = kwargs.authRole;
-        var action = kwargs.action;
-        var ressource = kwargs.ressource;
-        console.log(wsDomain + '.can', authId, authRole, action, ressource);
-        return that.can(authId, authRole, action, ressource);
-      } catch (err) {
-        console.error(err);
-        return false;
-      }
+      var authId = kwargs.authId;
+      var authRole = kwargs.authRole;
+      var action = kwargs.action;
+      var ressource = kwargs.ressource;
+      console.log(wsDomain + '.can', authId, authRole, action, ressource);
+      return that.can(authId, authRole, action, ressource);
     },
     '.roles.get': function(args, kwargs) {
       var authId = kwargs.authId;
       console.log(wsDomain + '.roles.get', authId);
-      try {
-        return that.getStaticRoles(authId);
-      } catch (err) {
-        console.error(err);
-        return [];
-      }
+      return that.getStaticRoles(authId);
     },
     '.roles.add': function(args, kwargs) {
       var authId = kwargs.authId;
       var role = kwargs.role;
       console.log(wsDomain + '.roles.add', authId, role);
-      try {
-        return that.addRole(authId, role);
-      } catch (err) {
-        console.error(err);
-        return false;
-      }
+      return that.addRoles(authId, role);
     },
     '.roles.remove': function(args, kwargs) {
       var authId = kwargs.authId;
       var role = kwargs.role;
       console.log(wsDomain + '.roles.remove', authId, role);
-      try {
-        return that.removeRole(authId, role);
-      } catch (err) {
-        console.error(err);
-        return false;
-      }
+      return that.removeRoles(authId, role);
+    },
+    '.roles.set': function(args, kwargs) {
+      var authId = kwargs.authId;
+      var role = kwargs.role;
+      console.log(wsDomain + '.roles.set', authId, role);
+      return that.setRoles(authId, role);
     }
   };
 
@@ -121,7 +106,6 @@ Authorizer.prototype.start = function() {
 
   return when.all(pendingRegistrations)
     .then(function() {
-      // TODO log start
       console.log('authorizer started');
       return when.resolve();
     });
@@ -130,7 +114,6 @@ Authorizer.prototype.start = function() {
 Authorizer.prototype.stop = function() {
   return this.ws.unregister()
     .then(function() {
-      // TODO log stop
       console.log('authorizer stopped');
       return when.resolve();
     });
@@ -139,21 +122,25 @@ Authorizer.prototype.stop = function() {
 // authRole optional (anonymous by default)
 Authorizer.prototype.can = function(authId, authRole, action, ressource) {
   var roles = this.roles;
-  var dynamicRoles = this.getDynamicRoles(authId, authRole);
+  var dynamicRoles;
   var areDynamicRolesGranted;
   var grantedRoles;
   var staticRoles;
 
+  if (!_.isString(authId) || _.isEmpty(authId)) {
+    throw new Error('invalid authId');
+  }
+
   if (!this.ressources.validate(ressource)) {
-    return false;
+    throw new Error('invalid ressource');
   }
 
   grantedRoles = this.permissions.getRoles(action, ressource);
   if (_.isEmpty(grantedRoles)) {
-    console.log('false', 'empty granted roles');
     return false;
   }
 
+  dynamicRoles = this.getDynamicRoles(authId, authRole);
   areDynamicRolesGranted = _.some(grantedRoles, function(grantedRole) {
     return _.some(dynamicRoles, function(userRole) {
       return roles.isGranted(userRole, grantedRole);
@@ -161,13 +148,11 @@ Authorizer.prototype.can = function(authId, authRole, action, ressource) {
   });
 
   if (areDynamicRolesGranted) {
-    console.log('true', 'dynamic');
     return true;
   }
 
   // static roles defined only for registered users
   if (authRole !== 'registered') {
-    console.log('false', 'not registered');
     return false;
   }
 
@@ -178,21 +163,16 @@ Authorizer.prototype.can = function(authId, authRole, action, ressource) {
           return roles.isGranted(userRole, grantedRole);
         });
       });
-    })
-    .then(function(can) {
-      console.log(can, 'static');
-      return when.resolve(can);
     });
 };
 
 // authRole optional (anonymous by default)
 Authorizer.prototype.getDynamicRoles = function(authId, authRole) {
-  var roles;
-  if (!_.isString(authId)) {
-    return [];
+  if (!_.isString(authId) || _.isEmpty(authId)) {
+    throw new Error('invalid authId');
   }
 
-  roles = [{
+  var roleInstances = [{
     name: '<ANONYMOUS>'
   }, {
     name: '<SELF>',
@@ -201,115 +181,161 @@ Authorizer.prototype.getDynamicRoles = function(authId, authRole) {
     }
   }];
   if (authRole === 'registered') {
-    roles.push({
+    roleInstances.push({
       name: '<REGISTERED>',
       params: {
         authId: authId
       }
     });
   }
-  return roles;
+  return roleInstances;
 };
 
 Authorizer.prototype.getStaticRoles = function(authId, _keepRowRef) {
-  var roles = this.roles;
-  var Role = this.db.model.Role;
-
-  if (!_.isString(authId)) {
-    return [];
+  if (!_.isString(authId) || _.isEmpty(authId)) {
+    throw new Error('invalid authId');
   }
 
-  return Role
-    .findAll({ where: { authId: authId }})
+  var roles = this.roles;
+  var Role = this.db.model.Role;
+  return Role.findAll({ where: { authId: authId }})
     .then(function(rows) {
-      var userRoles = [];
+      var roleInstances = [];
       _.each(rows, function(row) {
         var role = roles.instanciateRow(row.dataValues);
-        if (_.isUndefined(role)) {
-          return;
-        }
         if (_keepRowRef) {
           role.row = row;
         }
-        userRoles.push(role);
+        roleInstances.push(role);
       });
-      return userRoles;
-    }).catch(function() {
-      // TODO log error
-      return [];
+      return roleInstances;
+    }).catch(function(err) {
+      throw new Error('internal server error : ' + err.message);
     });
 };
 
-Authorizer.prototype.addRole = function(authId, role) {
+// rolesToAdd can be a role or an array of roles
+Authorizer.prototype.addRoles = function(authId, rolesToAdd) {
+  if (!_.isString(authId) || _.isEmpty(authId)) {
+    throw new Error('invalid authId');
+  }
+
   var roles = this.roles;
   var Role = this.db.model.Role;
-  var userRole;
-
-  if (!_.isString(authId) ||
-      !roles.isValid(role) ||
-      role.name === '<ANONYMOUS>' ||
-      role.name === '<SELF>' ||
-      role.name === '<REGISTERED>') {
-    // TODO log throw new Error('invalid role');
-    console.error('invalid role');
-    return false;
+  if (!_.isArray(rolesToAdd)) {
+    rolesToAdd = [rolesToAdd];
   }
+  _.each(rolesToAdd, function(role) {
+    if (!roles.isValid(role) ||
+        role.name === '<ANONYMOUS>' ||
+        role.name === '<SELF>' ||
+        role.name === '<REGISTERED>') {
+      throw new Error('invalid role');
+    }
+  });
 
-  userRole = roles.export(authId, role);
-  if (_.isUndefined(userRole)) {
-    // TODO log throw new Error('invalid role');
-    console.error('invalid role');
-    return false;
-  }
+  // remove roles extended by others in the rolesToAdd array
+  rolesToAdd = _.reject(rolesToAdd, function(role, i) {
+    return _.some(rolesToAdd, function(otherRole, j) {
+      if (i == j || !roles.isGranted(otherRole, role)) {
+        return false;
+      }
+      if (!roles.isGranted(role, otherRole)) { // otherRole > role
+        return true;
+      }
 
-  // first remove all roles that are extended by role
+      // else : otherRole <=> role, so keep the first one only
+      return i > j;
+    });
+  });
+
   return this.getStaticRoles(authId, true)
     .then(function(dbRoles) {
-      var pendingRemoves = [];
-      _.each(dbRoles, function(dbRole) {
-        if (roles.isGranted(role, dbRole)) {
-          pendingRemoves.push(dbRole.row.destroy());
-        }
+      // do not add roles in rolesToAdd extended by roles in dbRoles
+      rolesToAdd = _.reject(rolesToAdd, function(role) {
+        return _.some(dbRoles, function(dbRole) {
+          return roles.isGranted(dbRole, role);
+        });
       });
-      return when.all(pendingRemoves);
 
-    // create role
-    }).then(function() {
-      return Role.create(userRole);
+      // remove roles in dbRoles extended by roles in rolesToAdd
+      // note: pendingRemoves contains resolved promises for dbRoles to keep, it's harmless
+      var pendingRemoves = _.map(dbRoles, function(dbRole) {
+        var toRemove = _.some(rolesToAdd, function(role) {
+          return roles.isGranted(role, dbRole);
+        });
 
-    // return a clean result:)
-    }).then(function() {
-      return true;
-    }).catch(function() {
-      // TODO log error
-      console.log('cannot add role');
-      return false;
+        if (toRemove) {
+          return dbRole.row.destroy()
+            .catch(function() {
+              throw new Error('internal server error');
+            });
+        }
+        return when.resolve();
+      });
+
+      // add roles in rolesToAdd to the db
+      var pendingAdds = _.map(rolesToAdd, function(role) {
+        var row;
+        try {
+          row = roles.export(authId, role);
+        } catch (err) {
+          return when.reject(err);
+        }
+        return Role.create(row)
+          .catch(function() {
+            throw new Error('internal server error');
+          });
+      });
+
+      var pendingOps = _.flatten([pendingRemoves, pendingAdds], true);
+      return when.all(pendingOps)
+        .then(function() {
+          return when.resolve();
+        });
     });
+
 };
 
-Authorizer.prototype.removeRole = function(authId, role) {
+// accepts as rolesToRemove: undefined (rm all roles of authId), a role or and array of roles
+Authorizer.prototype.removeRoles = function(authId, rolesToRemove) {
   var roles = this.roles;
-  var userRole;
+  var Role = this.db.model.Role;
+  var whereClause;
 
-  if (!_.isString(authId) || !roles.isValid(role)) {
-    // TODO log throw new Error('invalid role');
-    return false;
+  if (!_.isString(authId) || _.isEmpty(authId)) {
+    throw new Error('invalid authId');
   }
 
-  userRole = roles.export(authId, role);
-  if (_.isUndefined(userRole)) {
-    // TODO log throw new Error('invalid role');
-    return false;
+  if (_.isUndefined(rolesToRemove)) {
+    whereClause = { authId: authId };
+
+  } else if (!_.isArray(rolesToRemove)) {
+    whereClause = roles.export(authId, rolesToRemove);
+
+  } else {
+    whereClause = {};
+    whereClause.$or = _.map(rolesToRemove, function(role) {
+      return roles.export(authId, role);
+    });
   }
 
-  return this.db.model.Role.destroy({
-    where: userRole
+  return Role.destroy({
+    where: whereClause
   }).then(function() {
-    return true;
+    return when.resolve();
   }).catch(function() {
-    // TODO log error
-    return false;
+    return when.reject(new Error('internal server error'));
   });
+};
+
+// accept as roleInstances a role or an array of roles
+Authorizer.prototype.setRoles = function(authId, roleInstances) {
+  var that = this;
+  return this.removeRoles(authId)
+    .then(function() {
+      return that.addRoles(authId, roleInstances);
+    });
 };
 
 module.exports = Authorizer;

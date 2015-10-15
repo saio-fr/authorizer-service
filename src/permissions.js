@@ -111,7 +111,7 @@ Permissions.prototype.add = function(permission) {
   });
 };
 
-// return role instances allowed to perform action on ressource (or an empty array)
+// return role instances allowed to perform action over ressource
 // we suppose that ressource has already been validated
 // only not bypassed params are instanciated in each returned role
 Permissions.prototype.getRoles = function(action, ressource) {
@@ -119,9 +119,12 @@ Permissions.prototype.getRoles = function(action, ressource) {
   var actions = this.actions;
   var params = this.params;
   var ressourceName;
-  if (!_.isString(action) || !_.contains(actions, action) ||
-      !_.isObject(ressource) || !_.has(ressource, 'name')) {
-    return [];
+  if (!_.isString(action) || !_.contains(actions, action)) {
+    throw new Error('invalid action');
+  }
+
+  if (!_.isObject(ressource) || !_.has(ressource, 'name')) {
+    throw new Error('invalid ressource');
   }
 
   ressourceName = ressource.name;

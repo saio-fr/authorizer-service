@@ -6,6 +6,8 @@ docker stop auth-authorizer;
 docker stop auth-crossbar;
 docker stop auth-db;
 
+docker logs auth-authorizer;
+
 # clean
 docker rm auth-test;
 docker rm auth-service;
