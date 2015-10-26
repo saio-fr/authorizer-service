@@ -29,15 +29,15 @@ The service registers procedures in a crossbar router at URLs starting with a do
 
 **_domain_.roles.add** :
 * `kwargs.authId : String`  
-* `kwargs.role : Role or [Role]`
+* `kwargs.roles : Role or [Role]`
 
 **_domain_.roles.set** : (overwrites current roles)
 * `kwargs.authId : String`  
-* `kwargs.role : Role or [Role]`
+* `kwargs.roles : Role or [Role]`
 
 **_domain_.roles.remove** :
 * `kwargs.authId : String`  
-* `kwargs.role : undefined, Role or [Role]`  
+* `kwargs.roles : undefined, Role or [Role]`  
     if undefined, removes all roles of authId
 
 * `return : Boolean` true if role successfully removed.
@@ -229,4 +229,5 @@ $ npm test
 # integration tests :
 # you need to have Docker installed
 $ npm run test.integration
+$ npm run test.integration.clean
 ```

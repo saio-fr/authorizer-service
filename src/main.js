@@ -82,19 +82,19 @@ Authorizer.prototype.start = function() {
     },
     '.roles.add': function(args, kwargs) {
       var authId = kwargs.authId;
-      var role = kwargs.role;
+      var role = kwargs.roles;
       console.log(wsDomain + '.roles.add', authId, role);
       return that.addRoles(authId, role);
     },
     '.roles.remove': function(args, kwargs) {
       var authId = kwargs.authId;
-      var role = kwargs.role;
+      var role = kwargs.roles;
       console.log(wsDomain + '.roles.remove', authId, role);
       return that.removeRoles(authId, role);
     },
     '.roles.set': function(args, kwargs) {
       var authId = kwargs.authId;
-      var role = kwargs.role;
+      var role = kwargs.roles;
       console.log(wsDomain + '.roles.set', authId, role);
       return that.setRoles(authId, role);
     }

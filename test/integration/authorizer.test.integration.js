@@ -90,7 +90,7 @@ tape('authorizer integration test', { timeout: 5000 }, function(t) {
   t.test('add role superAdmin to marcel', function(st) {
     return clients.internal.service.call('service.authorizer.roles.add', {
       authId: 'marcel',
-      role: { name: 'superAdmin' }
+      roles: { name: 'superAdmin' }
     })
     .catch(function(err) {
       console.log(err.message);
@@ -256,7 +256,7 @@ tape('authorizer integration test', { timeout: 5000 }, function(t) {
     ];
     var expectedReneRoles = rolesToAdd;
     return clients.internal.service.call('service.authorizer.roles.add',
-      { authId: 'rene', role: rolesToAdd })
+      { authId: 'rene', roles: rolesToAdd })
     .then(function() {
       return clients.internal.service.call('service.authorizer.roles.get', { authId: 'rene' });
     })
@@ -288,7 +288,7 @@ tape('authorizer integration test', { timeout: 5000 }, function(t) {
       }
     ];
     return clients.internal.service.call('service.authorizer.roles.add',
-      { authId: 'rene', role: rolesToAdd })
+      { authId: 'rene', roles: rolesToAdd })
     .then(function() {
       return clients.internal.service.call('service.authorizer.roles.get', { authId: 'rene' });
     })
@@ -320,7 +320,7 @@ tape('authorizer integration test', { timeout: 5000 }, function(t) {
       }
     ];
     return clients.internal.service.call('service.authorizer.roles.add',
-      { authId: 'rene', role: rolesToAdd })
+      { authId: 'rene', roles: rolesToAdd })
     .then(function() {
       return clients.internal.service.call('service.authorizer.roles.get', { authId: 'rene' });
     })
@@ -352,7 +352,7 @@ tape('authorizer integration test', { timeout: 5000 }, function(t) {
       }
     ];
     return clients.internal.service.call('service.authorizer.roles.add',
-      { authId: 'rene', role: rolesToAdd })
+      { authId: 'rene', roles: rolesToAdd })
     .then(function() {
       return clients.internal.service.call('service.authorizer.roles.get', { authId: 'rene' });
     })
@@ -378,7 +378,7 @@ tape('authorizer integration test', { timeout: 5000 }, function(t) {
       }
     ];
     return clients.internal.service.call('service.authorizer.roles.add',
-      { authId: 'rene', role: rolesToAdd })
+      { authId: 'rene', roles: rolesToAdd })
     .then(function() {
       return clients.internal.service.call('service.authorizer.roles.get', { authId: 'rene' });
     })
@@ -397,7 +397,7 @@ tape('authorizer integration test', { timeout: 5000 }, function(t) {
     ];
     var expectedReneRoles = rolesToSet;
     return clients.internal.service.call('service.authorizer.roles.set',
-      { authId: 'rene', role: rolesToSet })
+      { authId: 'rene', roles: rolesToSet })
     .then(function() {
       return clients.internal.service.call('service.authorizer.roles.get', { authId: 'rene' });
     })

@@ -108,7 +108,7 @@ Service.prototype.start = function() {
 Service.prototype.addAdmin = function(args, kwargs) {
   return this.ws.call('service.authorizer.roles.add', [], {
     authId: kwargs.authId,
-    role: {
+    roles: {
       name: 'admin',
       params: {
         companyId: kwargs.companyId
@@ -125,7 +125,7 @@ Service.prototype.addAdmin = function(args, kwargs) {
 Service.prototype.rmAdmin = function(args, kwargs) {
   return this.ws.call('service.authorizer.roles.remove', [], {
     authId: kwargs.authId,
-    role: {
+    roles: {
       name: 'admin',
       params: {
         companyId: kwargs.companyId
@@ -142,7 +142,7 @@ Service.prototype.addCustomer = function(args, kwargs, details) {
   var companyId = details.wildcards[0];
   return this.ws.call('service.authorizer.roles.add', [], {
     authId: kwargs.authId,
-    role: {
+    roles: {
       name: 'customer',
       params: {
         companyId: companyId
@@ -159,7 +159,7 @@ Service.prototype.rmCustomer = function(args, kwargs, details) {
   var companyId = details.wildcards[0];
   return this.ws.call('service.authorizer.roles.remove', [], {
     authId: kwargs.authId,
-    role: {
+    roles: {
       name: 'customer',
       params: {
         companyId: companyId
