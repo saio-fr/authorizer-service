@@ -17,13 +17,13 @@ sleep 20;
 echo "creating databases...";
 docker exec -d auth-db memsql-shell -e \
 "create database authorizer;";
-sleep 4;
+sleep 20;
 
 echo "starting crossbar...";
 docker run -d \
   --name auth-crossbar \
   auth-crossbar;
-sleep 4;
+sleep 20;
 
 echo "starting authorizer...";
 docker run -d \
@@ -32,7 +32,7 @@ docker run -d \
   --link auth-crossbar:crossbar \
   auth-authorizer \
     --ws-password servicepassword;
-sleep 8;
+sleep 20;
 
 echo "starting service...";
 docker run -d \
@@ -40,7 +40,7 @@ docker run -d \
   --link auth-crossbar:crossbar \
   auth-service \
     --ws-password servicepassword;
-sleep 4;
+sleep 20;
 
 echo "running test...";
 docker run \
