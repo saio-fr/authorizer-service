@@ -22,7 +22,7 @@ var TestContainer = require('@saio/service-runner').Tester;
 
 var Client = function(container, options) {
   this.ws = container.use('ws', WSocket, {
-    url: 'ws://crossbar:8080/',
+    url: 'ws://crossbar:8080',
     realm: 'test',
     authId: options.authId,
     password: options.password

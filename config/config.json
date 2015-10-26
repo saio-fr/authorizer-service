@@ -1,19 +1,19 @@
 {
-  "db": {
-    "dialect": "postgres",
-    "user": "postgres",
-    "password": "test",
-    "host": "db",
-    "port": "5432",
-    "dbname": "postgres"
-  },
-
   "ws": {
     "url": "ws://crossbar:8081",
     "realm": "saio",
     "domain": "fr.saio.service.authorizer",
     "authId": "service",
     "password": "service"
+  },
+
+  "db": {
+    "dialect": "mysql",
+    "user": "root",
+    "password": "",
+    "host": "db",
+    "port": "3306",
+    "dbname": "authorizer"
   },
 
   "auth": {

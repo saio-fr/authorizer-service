@@ -23,7 +23,7 @@ var WSocket = require('@saio/wsocket-component');
 
 var Service = function(container, options) {
   this.ws = container.use('ws', WSocket, {
-    url: 'ws://crossbar:8080/',
+    url: 'ws://crossbar:8080',
     realm: 'test',
     authId: 'service',
     password: options['ws-password']

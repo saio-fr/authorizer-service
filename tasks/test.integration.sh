@@ -8,11 +8,15 @@ docker build -t auth-service -f tasks/integration/dockerfiles/serviceDockerfile 
 docker build -t auth-test -f tasks/integration/dockerfiles/testDockerfile .;
 
 # start services
-echo "starting database...";
+echo "starting database server...";
 docker run -d \
 	--name auth-db \
-	-e POSTGRES_PASSWORD=test \
-	postgres;
+	memsql/quickstart;
+sleep 20;
+
+echo "creating databases...";
+docker exec -d auth-db memsql-shell -e \
+"create database authorizer;";
 sleep 4;
 
 echo "starting crossbar...";
@@ -27,9 +31,8 @@ docker run -d \
   --link auth-db:db \
   --link auth-crossbar:crossbar \
   auth-authorizer \
-    --ws-password servicepassword \
-    --db-password test;
-sleep 4;
+    --ws-password servicepassword;
+sleep 8;
 
 echo "starting service...";
 docker run -d \

@@ -101,6 +101,10 @@ Authorizer.prototype.start = function() {
   };
 
   var pendingRegistrations = _.map(procedures, function(procedure, uri) {
+    console.log(wsDomain + uri);
+    console.log(config.ws.url);
+    console.log(config.ws.realm);
+    console.log(config.ws.password);
     return that.ws.register(wsDomain + uri, procedure, { invoke: 'roundrobin' });
   });
 
