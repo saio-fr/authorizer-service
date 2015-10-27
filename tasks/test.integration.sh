@@ -15,8 +15,15 @@ docker run -d \
 sleep 20;
 
 echo "creating databases...";
-docker exec -d auth-db memsql-shell -e \
-"create database authorizer;";
+# docker exec doest not work in circle ci.
+# docker exec -d authorizer-db memsql-shell -e \
+# "create database authorizer;";
+docker run --rm \
+	--name auth-mysql-client \
+	--link auth-db:db \
+	mysql sh -c \
+	'mysql -h "$DB_PORT_3306_TCP_ADDR" -u root \
+	--execute="create database authorizer;"';
 sleep 20;
 
 echo "starting crossbar...";
